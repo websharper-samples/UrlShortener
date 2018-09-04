@@ -12,6 +12,7 @@ module Site =
 
     type MainTemplate = Templating.Template<"Main.html", serverLoad = Templating.ServerLoad.PerRequest>
 
+    /// The main page layout used by all our HTML content.
     let MainPage (body: Doc) =
         Content.Page(
             MainTemplate()
@@ -19,12 +20,14 @@ module Site =
                 .Doc()
         )
 
+    /// Content for the login page.
     let LoginContent (ctx: Context<EndPoint>) (facebook: OAuth2.Provider<EndPoint>) =
         MainTemplate.LoginPage()
             .FacebookLoginUrl(facebook.GetAuthorizationRequestUrl(ctx))
             .Doc()
         |> MainPage
 
+    /// Content for the home page once logged in.
     let HomeContent (ctx: Context<EndPoint>) (name: string) =
         MainTemplate.HomePage()
             .FullName(name)
@@ -32,14 +35,17 @@ module Site =
             .Doc()
         |> MainPage
 
+    /// Content for the account management page.
     let MyLinksContent ctx =
         text "TODO"
         |> MainPage
 
+    /// Content for an actual redirection link.
     let LinkContent ctx slug =
         text ("TODO: redirect to " + slug)
         |> MainPage
 
+    /// The full website.
     [<Website>]
     let Main config =
         let facebook = Authentication.FacebookProvider config

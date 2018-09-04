@@ -15,8 +15,6 @@
     <None Include="db\migrations\V2__Create_User.sql" />
     <None Include="db\migrations\V3__Add_User_FullName.sql" />
     <Compile Include="Database.fs" />
-    <Compile Include="Remoting.fs" />
-    <Compile Include="Client.fs" />
     <Compile Include="EndPoint.fs" />
     <Compile Include="Authentication.fs" />
     <Compile Include="Site.fs" />

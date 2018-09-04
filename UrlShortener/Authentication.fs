@@ -9,8 +9,10 @@ open WebSharper.OAuth.OAuth2
 open Microsoft.Extensions.Configuration
 open System.IO
 
+/// The JSON returned by Facebook when querying user data.
 type private FacebookUserData = { id: string; name: string }
 
+/// Get the user data for the owner of this token.
 let private getFacebookUserData (token: AuthenticationToken) : Async<FacebookUserData> =
     async {
         let req = WebRequest.CreateHttp("https://graph.facebook.com/v3.1/me")
@@ -21,6 +23,7 @@ let private getFacebookUserData (token: AuthenticationToken) : Async<FacebookUse
         return WebSharper.Json.Deserialize(body)
     }
 
+/// The OAuth2 provider for Facebook login.
 let FacebookProvider (config: IConfiguration) =
     let clientId = config.["facebookClientId"]
     let clientSecret = config.["facebookClientSecret"]
@@ -48,6 +51,7 @@ let FacebookProvider (config: IConfiguration) =
         )
     )
 
+/// Get the user id of the currently logged in user.
 let GetLoggedInUserId (ctx: Web.Context) = async {
     match! ctx.UserSession.GetLoggedInUser() with
     | None -> return None
@@ -59,6 +63,7 @@ let GetLoggedInUserId (ctx: Web.Context) = async {
             return None
 }
 
+/// Get the user data of the currently logged in user.
 let GetLoggedInUserData (ctx: Web.Context) (config: IConfiguration) = async {
     match! GetLoggedInUserId ctx with
     | None -> return None

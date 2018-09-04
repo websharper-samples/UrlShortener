@@ -2,9 +2,10 @@ namespace UrlShortener
 
 open WebSharper
 
+/// Defines all the endpoints served by this application.
 type EndPoint =
-    | [<EndPoint "/">] Home
-    | [<EndPoint "/my-links">] MyLinks
-    | [<EndPoint "/logout">] Logout
-    | [<EndPoint "/oauth">] OAuth
-    | [<EndPoint "/">] Link of slug: string
+    | [<EndPoint "GET /">] Home
+    | [<EndPoint "GET /my-links">] MyLinks
+    | [<EndPoint "GET /logout">] Logout
+    | [<EndPoint "GET /oauth">] OAuth
+    | [<EndPoint "GET /">] Link of slug: string
