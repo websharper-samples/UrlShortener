@@ -1,0 +1,14 @@
+source https://api.nuget.org/v3/index.json
+source https://daily.websharper.com/nuget
+
+framework: netcoreapp2.1
+storage: none
+
+nuget FSharp.Core ~> 4.5.0
+nuget Microsoft.AspNetCore.All 2.1.2
+nuget WebSharper ~> 4.5
+nuget WebSharper.AspNetCore ~> 4.5
+nuget WebSharper.FSharp ~> 4.5
+nuget WebSharper.UI ~> 4.5
+nuget WebSharper.Mvu ~> 4.5
+nuget WebSharper.OAuth ~> 4.5

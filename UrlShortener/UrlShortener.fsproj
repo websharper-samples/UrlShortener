@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <WebSharperProject>Website</WebSharperProject>
+    <WebProjectOutputDir>$(MSBuildThisFileDirectory)/wwwroot</WebProjectOutputDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Remoting.fs" />
+    <Compile Include="Client.fs" />
+    <Compile Include="EndPoint.fs" />
+    <Compile Include="Authentication.fs" />
+    <Compile Include="Site.fs" />
+    <Compile Include="Startup.fs" />
+    <Content Include="Main.html" CopyToPublishDirectory="Always" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>
