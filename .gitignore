@@ -4,5 +4,9 @@ WebSharper/
 paket-files/
 *.user
 .vs/
+.vscode/
 launchSettings.json
 appsettings.*.json
+packages/
+*.db
+lib/

@@ -5,5 +5,6 @@ open WebSharper
 type EndPoint =
     | [<EndPoint "/">] Home
     | [<EndPoint "/my-links">] MyLinks
-    | [<EndPoint "/">] Link of slug: string
+    | [<EndPoint "/logout">] Logout
     | [<EndPoint "/oauth">] OAuth
+    | [<EndPoint "/">] Link of slug: string

@@ -6,17 +6,21 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Logging
 open WebSharper.AspNetCore
 
-type Startup() =
+type Startup(loggerFactory: ILoggerFactory, config: IConfiguration) =
+    let logger = loggerFactory.CreateLogger<Startup>()
 
     member this.ConfigureServices(services: IServiceCollection) =
         services.AddAuthentication("WebSharper")
             .AddCookie("WebSharper", fun options -> ())
         |> ignore
 
-    member this.Configure(app: IApplicationBuilder, env: IHostingEnvironment, config: IConfiguration) =
+    member this.Configure(app: IApplicationBuilder, env: IHostingEnvironment) =
         if env.IsDevelopment() then app.UseDeveloperExceptionPage() |> ignore
+
+        Database.Migrate config logger
 
         app.UseAuthentication()
             .UseStaticFiles()
@@ -31,6 +35,12 @@ module Program =
     let main args =
         WebHost
             .CreateDefaultBuilder(args)
+            .ConfigureLogging(fun ctx logging ->
+                logging
+                    .AddConfiguration(ctx.Configuration.GetSection("Logging"))
+                    .AddConsole()
+                    .AddDebug()
+                |> ignore)
             .UseStartup<Startup>()
             .Build()
             .Run()

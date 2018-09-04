@@ -1,5 +1,6 @@
 namespace UrlShortener
 
+open System
 open WebSharper
 open WebSharper.Sitelets
 open WebSharper.OAuth
@@ -24,8 +25,10 @@ module Site =
             .Doc()
         |> MainPage
 
-    let HomeContent ctx =
-        MainTemplate.LoginPage()
+    let HomeContent (ctx: Context<EndPoint>) (name: string) =
+        MainTemplate.HomePage()
+            .FullName(name)
+            .LogoutUrl(ctx.Link Logout)
             .Doc()
         |> MainPage
 
@@ -46,15 +49,18 @@ module Site =
         Application.MultiPage (fun (ctx: Context<EndPoint>) endpoint -> async {
             match endpoint with
             | Home ->
-                let! loggedIn = ctx.UserSession.GetLoggedInUser()
-                match loggedIn with
+                match! Authentication.GetLoggedInUserData ctx config with
                 | None -> return! LoginContent ctx facebook
-                | Some uid -> return! HomeContent ctx
+                | Some name -> return! HomeContent ctx name
             | MyLinks ->
-                let! loggedIn = ctx.UserSession.GetLoggedInUser()
-                match loggedIn with
+                match! Authentication.GetLoggedInUserData ctx config with
                 | None -> return! Content.RedirectTemporary Home
-                | Some uid -> return! MyLinksContent ctx
-            | Link slug -> return! LinkContent ctx slug
-            | OAuth -> return! Content.ServerError
+                | Some name -> return! MyLinksContent ctx
+            | Link slug ->
+                return! LinkContent ctx slug
+            | Logout ->
+                do! ctx.UserSession.Logout()
+                return! Content.RedirectTemporary Home
+            | OAuth ->
+                return! Content.ServerError
         })

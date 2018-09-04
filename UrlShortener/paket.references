@@ -6,3 +6,6 @@ WebSharper.AspNetCore
 FSharp.Core
 WebSharper.Mvu
 WebSharper.OAuth
+SQLProvider
+System.Data.SQLite.Core
+Evolve

@@ -12,3 +12,6 @@ nuget WebSharper.FSharp ~> 4.5
 nuget WebSharper.UI ~> 4.5
 nuget WebSharper.Mvu ~> 4.5
 nuget WebSharper.OAuth ~> 4.5
+nuget SQLProvider ~> 1.1.49
+nuget System.Data.SQLite.Core ~> 1.0.0 storage: packages
+nuget Evolve ~> 1.8
