@@ -2,9 +2,11 @@
 
 open System
 open FSharp.Data.Sql
-open Microsoft.Data.Sqlite
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
+open Microsoft.Extensions.DependencyInjection
+open WebSharper
+open WebSharper.AspNetCore
 
 type Sql = SqlDataProvider<
             // Connect to SQLite using System.Data.Sqlite.
@@ -20,49 +22,54 @@ type Sql = SqlDataProvider<
 let private getConnectionString (config: IConfiguration) =
     config.GetSection("ConnectionStrings").["UrlShortener"]
 
-/// Apply all migrations.
-let Migrate (config: IConfiguration) (logger: ILogger) =
-    try
-        use ctx = new SqliteConnection(getConnectionString config)
-        let evolve =
-            new Evolve.Evolve(ctx, logger.LogInformation,
-                Locations = ["db/migrations"],
-                IsEraseDisabled = true)
-        evolve.Migrate()
-    with ex ->
-        logger.LogCritical("Database migration failed: {0}", ex)
+/// ASP.NET Core service that creates a data context per request.
+type Context(config: IConfiguration, loggerFactory: ILoggerFactory) =
+    let logger = loggerFactory.CreateLogger<Context>()
+    do logger.LogInformation("Creating db context")
+    let db = Sql.GetDataContext(getConnectionString config)
 
-/// Get a SQL data context.
-let GetDataContext (config: IConfiguration) =
-    Sql.GetDataContext(getConnectionString config)
+    /// Apply all migrations.
+    member this.Migrate() =
+        try
+            use ctx = db.CreateConnection()
+            let evolve =
+                new Evolve.Evolve(ctx, logger.LogInformation,
+                    Locations = ["db/migrations"],
+                    IsEraseDisabled = true)
+            evolve.Migrate()
+        with ex ->
+            logger.LogCritical("Database migration failed: {0}", ex)
 
-/// Get the user for this Facebook user id, or create a user if there isn't one.
-let GetOrCreateFacebookUser (db: Sql.dataContext) (fbUserId: string) (fbUserName: string) = async {
-    let existing =
-        query { for u in db.Main.User do
-                where (u.FacebookId = fbUserId)
-                select (Some u.Id)
-                headOrDefault }
-    match existing with
-    | None ->
-        let id = Guid.NewGuid()
-        let _u =
-            db.Main.User.Create(
-                Id = id,
-                FacebookId = fbUserId,
-                FullName = fbUserName)
-        do! db.SubmitUpdatesAsync()
-        return id
-    | Some id ->
-        return id
-}
+    /// Get the user for this Facebook user id, or create a user if there isn't one.
+    member this.GetOrCreateFacebookUser(fbUserId: string, fbUserName: string) = async {
+        let existing =
+            query { for u in db.Main.User do
+                    where (u.FacebookId = fbUserId)
+                    select (Some u.Id)
+                    headOrDefault }
+        match existing with
+        | None ->
+            let u =
+                db.Main.User.Create(
+                    Id = Guid.NewGuid(),
+                    FacebookId = fbUserId,
+                    FullName = fbUserName)
+            do! db.SubmitUpdatesAsync()
+            return u.Id
+        | Some id ->
+            return id
+    }
 
-/// Get the user's full name.
-let GetFullName (db: Sql.dataContext) (userId: Guid) = async {
-    let u =
-        query { for u in db.Main.User do
-                where (u.Id = userId)
-                select (Some u.FullName)
-                headOrDefault }
-    return u
-}
+    /// Get the user's full name.
+    member this.GetFullName(userId: Guid) = async {
+        let u =
+            query { for u in db.Main.User do
+                    where (u.Id = userId)
+                    select (Some u.FullName)
+                    headOrDefault }
+        return u
+    }
+
+type Web.Context with
+    member this.Db =
+        this.HttpContext().RequestServices.GetRequiredService<Context>()

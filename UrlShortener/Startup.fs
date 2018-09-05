@@ -13,18 +13,20 @@ type Startup(loggerFactory: ILoggerFactory, config: IConfiguration) =
     let logger = loggerFactory.CreateLogger<Startup>()
 
     member this.ConfigureServices(services: IServiceCollection) =
-        services.AddAuthentication("WebSharper")
-            .AddCookie("WebSharper", fun options -> ())
+        services.AddSitelet<Site>()
+                .AddScoped<Database.Context>()
+                .AddAuthentication("WebSharper")
+                .AddCookie("WebSharper", fun options -> ())
         |> ignore
 
-    member this.Configure(app: IApplicationBuilder, env: IHostingEnvironment) =
+    member this.Configure(app: IApplicationBuilder, env: IHostingEnvironment, db: Database.Context) =
         if env.IsDevelopment() then app.UseDeveloperExceptionPage() |> ignore
 
-        Database.Migrate config logger
+        db.Migrate()
 
         app.UseAuthentication()
             .UseStaticFiles()
-            .UseWebSharper(env, Site.Main config, config.GetSection("websharper"))
+            .UseWebSharper()
             .Run(fun context ->
                 context.Response.StatusCode <- 404
                 context.Response.WriteAsync("Page not found"))
@@ -35,12 +37,6 @@ module Program =
     let main args =
         WebHost
             .CreateDefaultBuilder(args)
-            .ConfigureLogging(fun ctx logging ->
-                logging
-                    .AddConfiguration(ctx.Configuration.GetSection("Logging"))
-                    .AddConsole()
-                    .AddDebug()
-                |> ignore)
             .UseStartup<Startup>()
             .Build()
             .Run()
