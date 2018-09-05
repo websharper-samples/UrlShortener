@@ -1123,7 +1123,7 @@ NUGET
     SQLitePCLRaw.provider.e_sqlite3.netstandard11 (1.1.11)
       NETStandard.Library (>= 1.6)
       SQLitePCLRaw.core (>= 1.1.11)
-    SQLProvider (1.1.49)
+    SQLProvider (1.1.50)
       FSharp.Core (>= 3.1.2.5)
       NETStandard.Library (>= 2.0)
       System.Console (>= 4.3)

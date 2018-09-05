@@ -7,12 +7,14 @@ open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
 
 type Sql = SqlDataProvider<
+            // Connect to SQLite using System.Data.Sqlite.
             Common.DatabaseProviderTypes.SQLITE,
             SQLiteLibrary = Common.SQLiteLibrary.SystemDataSQLite,
-            ResolutionPath = const(__SOURCE_DIRECTORY__ + "/../lib"),
+            ResolutionPath = const(__SOURCE_DIRECTORY__ + "/../packages/System.Data.SQLite.Core/lib/netstandard2.0/"),
+            // Store the database file in db/urlshortener.db.
             ConnectionString = const("Data Source=" + __SOURCE_DIRECTORY__ + "/db/urlshortener.db"),
-            // The following needs the next release of SQLProvider (current is 1.1.49) to work correctly with cross-compilation:
-            // ContextSchemaPath = const(__SOURCE_DIRECTORY__ + "/db/urlshortener.schema.json"),
+            // Store the schema as JSON so that the compiler doesn't need the database to exist.
+            ContextSchemaPath = const(__SOURCE_DIRECTORY__ + "/db/urlshortener.schema.json"),
             UseOptionTypes = true>
 
 let private getConnectionString (config: IConfiguration) =
