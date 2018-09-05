@@ -19,14 +19,13 @@ type Sql = SqlDataProvider<
             ContextSchemaPath = const(__SOURCE_DIRECTORY__ + "/db/urlshortener.schema.json"),
             UseOptionTypes = true>
 
-let private getConnectionString (config: IConfiguration) =
-    config.GetSection("ConnectionStrings").["UrlShortener"]
-
 /// ASP.NET Core service that creates a data context per request.
-type Context(config: IConfiguration, loggerFactory: ILoggerFactory) =
-    let logger = loggerFactory.CreateLogger<Context>()
+type Context(config: IConfiguration, logger: ILogger<Context>) =
     do logger.LogInformation("Creating db context")
-    let db = Sql.GetDataContext(getConnectionString config)
+
+    let db =
+        config.GetSection("ConnectionStrings").["UrlShortener"]
+        |> Sql.GetDataContext
 
     /// Apply all migrations.
     member this.Migrate() =
@@ -71,5 +70,6 @@ type Context(config: IConfiguration, loggerFactory: ILoggerFactory) =
     }
 
 type Web.Context with
+    /// Get the database context for the current request.
     member this.Db =
         this.HttpContext().RequestServices.GetRequiredService<Context>()

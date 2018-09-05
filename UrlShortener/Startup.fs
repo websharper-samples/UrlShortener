@@ -4,13 +4,10 @@ open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
-open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
-open Microsoft.Extensions.Logging
 open WebSharper.AspNetCore
 
-type Startup(loggerFactory: ILoggerFactory, config: IConfiguration) =
-    let logger = loggerFactory.CreateLogger<Startup>()
+type Startup() =
 
     member this.ConfigureServices(services: IServiceCollection) =
         services.AddSitelet<Site>()
