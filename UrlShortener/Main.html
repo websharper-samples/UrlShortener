@@ -1,38 +1,82 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${Title}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
-    <link rel="stylesheet" href="/Content/index.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${Title}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+  <link rel="stylesheet" href="/Content/index.css" />
 </head>
+
 <body>
-    <div ws-replace="Body">
-        <section ws-template="LoginPage" class="hero is-success is-fullheight login-page">
-            <div class="hero-body">
-                <div class="container has-text-centered">
-                    <div class="column is-4 is-offset-4">
-                        <h3 class="title has-text-grey">WebSharper URL Shortener</h3>
-                        <p class="subtitle has-text-grey">Please login to proceed.</p>
-                        <div class="box">
-                            <figure class="avatar">
-                                <img src="https://placehold.it/128x128" />
-                            </figure>
-                            <a href="${FacebookLoginUrl}" class="button is-block is-info is-large is-fullwidth">
-                                Log in with Facebook
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section ws-template="HomePage">
-            Welcome, ${FullName}!
-            <a href="${LogoutUrl}">Log out</a>
-        </section>
+  <div ws-replace="NavBar"></div>
+  <div ws-replace="Body"></div>
+  <script ws-replace="scripts"></script>
+
+  <section ws-template="LoginPage" class="hero is-success is-fullheight login-page">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="column is-4 is-offset-4">
+          <h3 class="title has-text-grey">WebSharper URL Shortener</h3>
+          <p class="subtitle has-text-grey">Please login to proceed.</p>
+          <div class="box">
+            <figure class="avatar">
+              <img src="https://placehold.it/128x128" />
+            </figure>
+            <a href="${FacebookLoginUrl}" class="button is-block is-info is-large is-fullwidth">
+              Log in with Facebook
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-    <script ws-replace="scripts"></script>
+  </section>
+
+  <section ws-template="HomePage" class="hero is-success is-fullheight login-page">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="column is-4 is-offset-4">
+          <h3 class="title has-text-grey">WebSharper URL Shortener</h3>
+          <div class="box">
+            <figure class="avatar">
+              <img src="https://placehold.it/128x128" />
+            </figure>
+            <form>
+              <div class="field">
+                <div class="control">
+                  <input ws-var="Url" ws-attr="AttrUrl" class="input is-large" type="url" placeholder="Shorten this link" autofocus />
+                </div>
+              </div>
+              <button ws-onclick="ConfirmUrl" class="button is-block is-info is-large is-fullwidth">Shorten</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav ws-template="MainNavBar" class="navbar is-dark" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="${HomeUrl}">
+        <img src="https://placehold.it/96x24" width="96" height="24" />
+      </a>
+      <a class="navbar-item" href="${MyLinksUrl}">
+        My links
+      </a>
+      <a class="navbar-item" href="${LogoutUrl}">
+        Log out
+      </a>
+    </div>
+  </nav>
+
+  <section ws-template="MyLinksPage" class="section">
+    <div class="container">
+      Welcome, ${FullName}!
+    </div>
+  </section>
+
 </body>
+
 </html>

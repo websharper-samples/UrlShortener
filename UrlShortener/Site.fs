@@ -9,44 +9,52 @@ open WebSharper.UI.Html
 open WebSharper.UI.Server
 open Microsoft.Extensions.Configuration
 
-type MainTemplate = Templating.Template<"Main.html", serverLoad = Templating.ServerLoad.PerRequest>
+type MainTemplate = Templating.Template<"Main.html", serverLoad = Templating.ServerLoad.WhenChanged>
 
 /// The full website.
 type Site(config: IConfiguration) =
     inherit ISiteletService<EndPoint>()
 
-    /// The main page layout used by all our HTML content.
-    let MainPage (body: Doc) =
+    let NavBar (ctx: Context<EndPoint>) =
+        MainTemplate.MainNavBar()
+            .HomeUrl(ctx.Link Home)
+            .MyLinksUrl(ctx.Link MyLinks)
+            .LogoutUrl(ctx.Link Logout)
+            .Doc()
+
+    /// The page layout used by all our HTML content.
+    let Page (ctx: Context<EndPoint>) (withNavBar: bool) (body: Doc) =
         Content.Page(
             MainTemplate()
                 .Body(body)
+                .NavBar(if withNavBar then NavBar ctx else Doc.Empty)
                 .Doc()
         )
 
     /// Content for the login page.
-    let LoginContent (ctx: Context<EndPoint>) (facebook: OAuth2.Provider<EndPoint>) =
+    let LoginPage (ctx: Context<EndPoint>) (facebook: OAuth2.Provider<EndPoint>) =
         MainTemplate.LoginPage()
             .FacebookLoginUrl(facebook.GetAuthorizationRequestUrl(ctx))
             .Doc()
-        |> MainPage
+        |> Page ctx false
 
     /// Content for the home page once logged in.
-    let HomeContent (ctx: Context<EndPoint>) (name: string) =
+    let HomePage (ctx: Context<EndPoint>) (name: string) =
         MainTemplate.HomePage()
-            .FullName(name)
-            .LogoutUrl(ctx.Link Logout)
             .Doc()
-        |> MainPage
+        |> Page ctx true
 
     /// Content for the account management page.
-    let MyLinksContent ctx =
-        text "TODO"
-        |> MainPage
+    let MyLinksPage (ctx: Context<EndPoint>) (name: string) =
+        MainTemplate.MyLinksPage()
+            .FullName(name)
+            .Doc()
+        |> Page ctx true
 
     /// Content for an actual redirection link.
     let LinkContent ctx slug =
-        text ("TODO: redirect to " + slug)
-        |> MainPage
+        // TODO: get the URL from the database
+        Content.RedirectPermanentToUrl "https://websharper.com"
         
     let facebook = Authentication.FacebookProvider config
     
@@ -57,12 +65,12 @@ type Site(config: IConfiguration) =
             match endpoint with
             | Home ->
                 match! Authentication.GetLoggedInUserData ctx with
-                | None -> return! LoginContent ctx facebook
-                | Some name -> return! HomeContent ctx name
+                | None -> return! LoginPage ctx facebook
+                | Some name -> return! HomePage ctx name
             | MyLinks ->
                 match! Authentication.GetLoggedInUserData ctx with
                 | None -> return! Content.RedirectTemporary Home
-                | Some name -> return! MyLinksContent ctx
+                | Some name -> return! MyLinksPage ctx name
             | Link slug ->
                 return! LinkContent ctx slug
             | Logout ->
