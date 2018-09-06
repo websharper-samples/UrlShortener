@@ -25,11 +25,10 @@ let private getFacebookUserData (token: AuthenticationToken) : Async<FacebookUse
 
 /// The OAuth2 client for Facebook login.
 let FacebookProvider (config: IConfiguration) =
-    let clientId = config.["facebookClientId"]
-    let clientSecret = config.["facebookClientSecret"]
+    let config = config.GetSection("facebook")
     Provider.Setup(
         // Create a Facebook OAuth client with the given app credentials.
-        service = ServiceSettings.Facebook(clientId, clientSecret),
+        service = ServiceSettings.Facebook(config.["clientId"], config.["clientSecret"]),
         // Upon success or failure, users are redirected to EndPoint.OAuth (which points to to "/oauth").
         redirectEndpointAction = OAuth,
         redirectEndpoint = (fun ctx resp ->
