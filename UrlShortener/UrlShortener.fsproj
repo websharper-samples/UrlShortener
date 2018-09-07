@@ -21,9 +21,11 @@
   </ItemGroup>
   <Target Name="CopyLib" BeforeTargets="BeforeCompile">
     <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x64/lib/netstandard2.0/SQLite.Interop.dll"
-          DestinationFolder="../packages/System.Data.SQLite.Core/lib/netstandard2.0/x64" />
+          DestinationFolder="../packages/System.Data.SQLite.Core/lib/netstandard2.0/x64"
+          SkipUnchangedFiles="true" />
     <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x86/lib/netstandard2.0/SQLite.Interop.dll"
-          DestinationFolder="../packages/System.Data.SQLite.Core/lib/netstandard2.0/x86" />
+          DestinationFolder="../packages/System.Data.SQLite.Core/lib/netstandard2.0/x86"
+          SkipUnchangedFiles="true" />
   </Target>
   <Target Name="CopyBin" AfterTargets="Build">
     <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x64/lib/netstandard2.0/SQLite.Interop.dll"
