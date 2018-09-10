@@ -15,42 +15,28 @@
   <div ws-replace="Body"></div>
   <script ws-replace="scripts"></script>
 
-  <section ws-template="LoginPage" class="hero is-success is-fullheight login-page">
+  <section ws-template="SplashPage" class="hero is-success is-fullheight login-page">
     <div class="hero-body">
       <div class="container has-text-centered">
         <div class="column is-4 is-offset-4">
-          <h3 class="title has-text-grey">WebSharper URL Shortener</h3>
-          <p class="subtitle has-text-grey">Please login to proceed.</p>
+          <h3 class="title has-text-grey">${Title}</h3>
+          <p class="subtitle has-text-grey">${Subtitle}</p>
           <div class="box">
             <figure class="avatar">
               <img src="https://placehold.it/128x128" />
             </figure>
-            <a href="${FacebookLoginUrl}" class="button is-block is-info is-large is-fullwidth">
-              Log in with Facebook
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section ws-template="HomePage" class="hero is-success is-fullheight login-page">
-    <div class="hero-body">
-      <div class="container has-text-centered">
-        <div class="column is-4 is-offset-4">
-          <h3 class="title has-text-grey">WebSharper URL Shortener</h3>
-          <div class="box">
-            <figure class="avatar">
-              <img src="https://placehold.it/128x128" />
-            </figure>
-            <form>
-              <div class="field">
-                <div class="control">
-                  <input ws-var="Url" ws-attr="AttrUrl" class="input is-large" type="url" placeholder="Shorten this link" autofocus />
+            <div ws-replace="Content">
+            
+              <form ws-template="HomeContent" method="post" action="${CreateLinkUrl}">
+                <div class="field">
+                  <div class="control">
+                    <input ws-var="Url" ws-attr="UrlAttr" class="input is-large" name="url" type="url" placeholder="Shorten this link" autofocus />
+                  </div>
                 </div>
-              </div>
-              <button ws-onclick="ConfirmUrl" class="button is-block is-info is-large is-fullwidth">Shorten</button>
-            </form>
+                <button ws-onclick="ConfirmUrl" class="button is-block is-info is-large is-fullwidth">Shorten</button>
+              </form>
+
+            </div>
           </div>
         </div>
       </div>

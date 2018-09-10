@@ -9,3 +9,4 @@ type EndPoint =
     | [<EndPoint "GET /logout">] Logout
     | [<EndPoint "GET /oauth">] OAuth
     | [<EndPoint "GET /">] Link of slug: string
+    | [<EndPoint "POST /create-link"; FormData "url">] CreateLink of url: string

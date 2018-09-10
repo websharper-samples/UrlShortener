@@ -69,6 +69,32 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
         return u
     }
 
+    /// Create a new link on this user's behalf, pointing to this url.
+    /// Returns the slug for this new link.
+    member this.CreateLink(userId: Guid, url: string) = async {
+        let r =
+            db.Main.Redirection.Create(
+                Id = int64 (Random().Next()),
+                CreatorId = userId,
+                Url = url)
+        do! db.SubmitUpdatesAsync()
+        return string r.Id
+    }
+
+    /// Get the url pointed to by the given slug, if any.
+    member this.TryGetLink(slug: string) = async {
+        match Int64.TryParse slug with
+        | true, linkId ->
+            let u =
+                query { for u in db.Main.Redirection do
+                        where (u.Id = linkId)
+                        select (Some u.Url)
+                        headOrDefault }
+            return u
+        | false, _ ->
+            return None
+    }
+
 type Web.Context with
     /// Get the database context for the current request.
     member this.Db =
