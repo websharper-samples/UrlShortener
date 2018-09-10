@@ -95,6 +95,31 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
             return None
     }
 
+    /// Get data about all the links created by the given user.
+    member this.GetAllUserLinks(userId: Guid) = async {
+        let links =
+            query { for l in db.Main.Redirection do
+                    where (l.CreatorId = userId)
+                    select l }
+        return Array.ofSeq links
+    }
+
+    /// Check that this link belongs to this user, and if yes, delete it.
+    member this.DeleteLink(userId: Guid, slug: string) = async {
+        let linkId = int64 slug
+        let link =
+            query { for l in db.Main.Redirection do
+                    where (l.Id = linkId && l.CreatorId = userId)
+                    select (Some l)
+                    headOrDefault }
+        match link with
+        | Some l ->
+            l.Delete()
+            return! db.SubmitUpdatesAsync()
+        | None ->
+            return ()
+    }
+
 type Web.Context with
     /// Get the database context for the current request.
     member this.Db =

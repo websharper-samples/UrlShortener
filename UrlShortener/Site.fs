@@ -63,7 +63,7 @@ type Site(config: IConfiguration) =
     /// Content for the account management page.
     let MyLinksPage (ctx: Context<EndPoint>) (name: string) =
         MainTemplate.MyLinksPage()
-            .FullName(name)
+            .Content(client <@ Client.MyLinks name @>)
             .Doc()
         |> Page ctx true
 

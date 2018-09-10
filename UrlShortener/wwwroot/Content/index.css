@@ -41,3 +41,7 @@
 .login-page p.subtitle {
     padding-top: 1rem;
 }
+
+.table th, .table td {
+    vertical-align: middle;
+}
