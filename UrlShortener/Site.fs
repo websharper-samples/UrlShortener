@@ -9,6 +9,7 @@ open WebSharper.UI
 open WebSharper.UI.Html
 open WebSharper.UI.Server
 open Microsoft.Extensions.Configuration
+open UrlShortener.DataModel
 open UrlShortener.Database
 
 type MainTemplate = Templating.Template<"Main.html", serverLoad = Templating.ServerLoad.WhenChanged>

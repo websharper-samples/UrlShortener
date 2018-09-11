@@ -7,6 +7,7 @@ open WebSharper
 open WebSharper.Sitelets
 open WebSharper.OAuth.OAuth2
 open Microsoft.Extensions.Configuration
+open UrlShortener.DataModel
 open UrlShortener.Database
 
 /// The JSON returned by Facebook when querying user data.

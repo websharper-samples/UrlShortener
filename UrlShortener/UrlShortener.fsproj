@@ -12,8 +12,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="db\migrations\*.sql" CopyToPublishDirectory="Always" />
+    <Compile Include="DataModel.fs" />
     <Compile Include="Database.fs" />
-    <Compile Include="EndPoint.fs" />
     <Compile Include="Authentication.fs" />
     <Compile Include="Remoting.fs" />
     <Compile Include="Client.fs" />

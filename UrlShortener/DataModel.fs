@@ -1,0 +1,52 @@
+module UrlShortener.DataModel
+
+open System
+open WebSharper
+
+/// Defines all the endpoints served by this application.
+type EndPoint =
+    | [<EndPoint "GET /">] Home
+    | [<EndPoint "GET /my-links">] MyLinks
+    | [<EndPoint "GET /logout">] Logout
+    | [<EndPoint "GET /oauth">] OAuth
+    | [<EndPoint "GET /">] Link of slug: string
+    | [<EndPoint "POST /create-link"; FormData "url">] CreateLink of url: string
+
+[<JavaScript>]
+type LinkData =
+    {
+        Slug: string
+        LinkUrl: string
+        TargetUrl: string
+        VisitCount: int64
+    }
+
+/// Base64-URL encoding.
+let EncodeLinkId (linkId: int64) =
+    let bytes = BitConverter.GetBytes(linkId)
+    Convert.ToBase64String(bytes)
+        .Replace("=", "")
+        .Replace('+', '-')
+        .Replace('/', '_')
+
+/// Base64-URL decoding.
+let TryDecodeLinkId (slug: string) =
+    if String.IsNullOrEmpty slug then
+        Some 0L
+    else
+        let s =
+            slug.Replace('-', '+')
+                .Replace('_', '/')
+            + (String.replicate (4 - slug.Length % 4) "=")
+        try BitConverter.ToInt64(Convert.FromBase64String s, 0) |> Some
+        with _ -> None
+
+/// Create a new random user id.
+let NewUserId() =
+    Guid.NewGuid()
+
+/// Create a new random link id.
+let NewLinkId() =
+    let bytes = Array.zeroCreate<byte> 8
+    Random().NextBytes(bytes)
+    BitConverter.ToInt64(bytes, 0)

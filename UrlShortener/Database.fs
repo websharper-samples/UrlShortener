@@ -8,6 +8,7 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open WebSharper
 open WebSharper.AspNetCore
+open UrlShortener.DataModel
 
 type Sql = SqlDataProvider<
             // Connect to SQLite using System.Data.Sqlite.
@@ -51,7 +52,7 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
         | None ->
             let u =
                 db.Main.User.Create(
-                    Id = Guid.NewGuid(),
+                    Id = NewUserId(),
                     FacebookId = fbUserId,
                     FullName = fbUserName)
             do! db.SubmitUpdatesAsync()
@@ -75,32 +76,30 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
     member this.CreateLink(userId: Guid, url: string) = async {
         let r =
             db.Main.Redirection.Create(
-                Id = int64 (Random().Next()),
+                Id = NewLinkId(),
                 CreatorId = userId,
                 Url = url)
         do! db.SubmitUpdatesAsync()
-        return string r.Id
+        return EncodeLinkId r.Id
     }
 
     /// Get the url pointed to by the given slug, if any,
     /// and increment its visit count.
     member this.TryVisitLink(slug: string) = async {
-        match Int64.TryParse slug with
-        | true, linkId ->
+        match TryDecodeLinkId slug with
+        | None -> return None
+        | Some linkId ->
             let link =
                 query { for l in db.Main.Redirection do
                         where (l.Id = linkId)
                         select (Some l)
                         headOrDefault }
             match link with
+            | None -> return None
             | Some link ->
                 link.VisitCount <- link.VisitCount + 1L
                 do! db.SubmitUpdatesAsync()
                 return Some link.Url
-            | None ->
-                return None
-        | false, _ ->
-            return None
     }
 
     /// Get data about all the links created by the given user.
@@ -114,21 +113,19 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
 
     /// Check that this link belongs to this user, and if yes, delete it.
     member this.DeleteLink(userId: Guid, slug: string) = async {
-        match Int64.TryParse slug with
-        | true, linkId ->
+        match TryDecodeLinkId slug with
+        | None -> return ()
+        | Some linkId ->
             let link =
                 query { for l in db.Main.Redirection do
                         where (l.Id = linkId && l.CreatorId = userId)
                         select (Some l)
                         headOrDefault }
             match link with
+            | None -> return ()
             | Some l ->
                 l.Delete()
                 return! db.SubmitUpdatesAsync()
-            | None ->
-                return ()
-        | false, _ ->
-            return ()
     }
 
 type Web.Context with

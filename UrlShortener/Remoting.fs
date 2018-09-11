@@ -2,26 +2,21 @@ namespace UrlShortener
 
 open System
 open WebSharper
+open WebSharper.Sitelets.InferRouter
+open UrlShortener.DataModel
 open UrlShortener.Database
 
 module Remoting =
 
-    [<JavaScript>]
-    type LinkData =
-        {
-            Slug: string
-            LinkUrl: string
-            TargetUrl: string
-            VisitCount: int64
-        }
+    let private router = Router.Infer<EndPoint>()
 
     let private getAllUserLinks (ctx: Web.Context) (userId: Guid) =
         async {
             let! links = ctx.Db.GetAllUserLinks userId
             return links
                 |> Array.map (fun l ->
-                    let slug = string l.Id
-                    let path = "/" + slug
+                    let slug = EncodeLinkId l.Id
+                    let path = router.Link(Link slug)
                     let url =
                         UriBuilder(ctx.RequestUri, Path = path)
                             .ToString()
@@ -30,7 +25,7 @@ module Remoting =
                         LinkUrl = url
                         TargetUrl = l.Url
                         VisitCount = l.VisitCount
-                    }
+                    } : DataModel.LinkData
                 )
         }
 

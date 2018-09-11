@@ -34,7 +34,7 @@ module Model =
 
     type Message =
         | Refresh
-        | Refreshed of links: Remoting.LinkData[]
+        | Refreshed of links: DataModel.LinkData[]
         | Delete of slug: string
 
 module View =
