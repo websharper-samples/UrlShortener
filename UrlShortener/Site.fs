@@ -96,7 +96,7 @@ type Site(config: IConfiguration) =
     override val Sitelet =
         facebook.RedirectEndpointSitelet
         <|>
-        Sitelet.New Router (fun ctx endpoint -> async {
+        Application.MultiPage (fun (ctx: Context<EndPoint>) endpoint -> async {
             match endpoint with
             | Home ->
                 match! Authentication.GetLoggedInUserData ctx with
