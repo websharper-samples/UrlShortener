@@ -83,6 +83,14 @@ type Site(config: IConfiguration) =
         |> SplashBody "Link created!" None
         |> Page ctx true
 
+    /// Content when a link is not found
+    let LinkNotFoundPage (ctx: Context<EndPoint>) =
+        div [attr.``class`` "subtitle has-text-dark"] [
+            text "This link does not exist or has been deleted."
+        ]
+        |> SplashBody "Not found!" None
+        |> Page ctx false
+
     let facebook = Authentication.FacebookProvider config
     
     override val Sitelet =
@@ -101,7 +109,7 @@ type Site(config: IConfiguration) =
             | Link slug ->
                 match! ctx.Db.TryVisitLink(slug) with
                 | Some url -> return! Content.RedirectTemporaryToUrl url
-                | None -> return! Content.NotFound // TODO: put some HTML content on the 404 page
+                | None -> return! LinkNotFoundPage ctx
             | Logout ->
                 do! ctx.UserSession.Logout()
                 return! Content.RedirectTemporary Home
