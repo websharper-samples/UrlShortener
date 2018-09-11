@@ -11,7 +11,7 @@ type Startup() =
 
     member this.ConfigureServices(services: IServiceCollection) =
         services.AddSitelet<Site>()
-                .AddScoped<Database.Context>()
+                .AddTransient<Database.Context>()
                 .AddAuthentication("WebSharper")
                 .AddCookie("WebSharper", fun options -> ())
         |> ignore

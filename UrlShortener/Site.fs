@@ -99,7 +99,7 @@ type Site(config: IConfiguration) =
                 | None -> return! Content.RedirectTemporary Home
                 | Some name -> return! MyLinksPage ctx name
             | Link slug ->
-                match! ctx.Db.TryGetLink(slug) with
+                match! ctx.Db.TryVisitLink(slug) with
                 | Some url -> return! Content.RedirectTemporaryToUrl url
                 | None -> return! Content.NotFound // TODO: put some HTML content on the 404 page
             | Logout ->

@@ -2,6 +2,7 @@
 
 open System
 open FSharp.Data.Sql
+open FSharp.Data.Sql.Transactions
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
@@ -19,13 +20,13 @@ type Sql = SqlDataProvider<
             ContextSchemaPath = const(__SOURCE_DIRECTORY__ + "/db/urlshortener.schema.json"),
             UseOptionTypes = true>
 
-/// ASP.NET Core service that creates a data context per request.
+/// ASP.NET Core service that creates a new data context every time it's required.
 type Context(config: IConfiguration, logger: ILogger<Context>) =
     do logger.LogInformation("Creating db context")
 
     let db =
-        config.GetSection("ConnectionStrings").["UrlShortener"]
-        |> Sql.GetDataContext
+        let connString = config.GetSection("ConnectionStrings").["UrlShortener"]
+        Sql.GetDataContext(connString, TransactionOptions.Default)
 
     /// Apply all migrations.
     member this.Migrate() =
@@ -81,16 +82,23 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
         return string r.Id
     }
 
-    /// Get the url pointed to by the given slug, if any.
-    member this.TryGetLink(slug: string) = async {
+    /// Get the url pointed to by the given slug, if any,
+    /// and increment its visit count.
+    member this.TryVisitLink(slug: string) = async {
         match Int64.TryParse slug with
         | true, linkId ->
-            let u =
-                query { for u in db.Main.Redirection do
-                        where (u.Id = linkId)
-                        select (Some u.Url)
+            let link =
+                query { for l in db.Main.Redirection do
+                        where (l.Id = linkId)
+                        select (Some l)
                         headOrDefault }
-            return u
+            match link with
+            | Some link ->
+                link.VisitCount <- link.VisitCount + 1L
+                do! db.SubmitUpdatesAsync()
+                return Some link.Url
+            | None ->
+                return None
         | false, _ ->
             return None
     }
@@ -106,21 +114,24 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
 
     /// Check that this link belongs to this user, and if yes, delete it.
     member this.DeleteLink(userId: Guid, slug: string) = async {
-        let linkId = int64 slug
-        let link =
-            query { for l in db.Main.Redirection do
-                    where (l.Id = linkId && l.CreatorId = userId)
-                    select (Some l)
-                    headOrDefault }
-        match link with
-        | Some l ->
-            l.Delete()
-            return! db.SubmitUpdatesAsync()
-        | None ->
+        match Int64.TryParse slug with
+        | true, linkId ->
+            let link =
+                query { for l in db.Main.Redirection do
+                        where (l.Id = linkId && l.CreatorId = userId)
+                        select (Some l)
+                        headOrDefault }
+            match link with
+            | Some l ->
+                l.Delete()
+                return! db.SubmitUpdatesAsync()
+            | None ->
+                return ()
+        | false, _ ->
             return ()
     }
 
 type Web.Context with
-    /// Get the database context for the current request.
+    /// Get a new database context.
     member this.Db =
         this.HttpContext().RequestServices.GetRequiredService<Context>()

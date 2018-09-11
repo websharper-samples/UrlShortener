@@ -14,7 +14,7 @@ module Model =
         {
             LinkUrl: string
             TargetUrl: string
-            VisitCount: int
+            VisitCount: int64
             Deleting: bool
         }
 
@@ -68,7 +68,7 @@ module View =
 
     let Page dispatch (model: View<Model>) =
         let total =
-            V(Map.fold (fun res _ v -> res + v.VisitCount) 0 model.V.Links)
+            V(Map.fold (fun res _ v -> res + v.VisitCount) 0L model.V.Links)
         Doc.Concat [
             h1 [attr.``class`` "title"] [
                 text ("Welcome, " + model.V.UserDisplayName + "!")

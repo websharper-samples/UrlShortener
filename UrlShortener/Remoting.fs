@@ -12,7 +12,7 @@ module Remoting =
             Slug: string
             LinkUrl: string
             TargetUrl: string
-            VisitCount: int
+            VisitCount: int64
         }
 
     let private getAllUserLinks (ctx: Web.Context) (userId: Guid) =
@@ -29,7 +29,7 @@ module Remoting =
                         Slug = slug
                         LinkUrl = url
                         TargetUrl = l.Url
-                        VisitCount = 0 // TODO
+                        VisitCount = l.VisitCount
                     }
                 )
         }
