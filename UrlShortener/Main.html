@@ -22,9 +22,6 @@
           <h3 class="title has-text-grey">${Title}</h3>
           <p class="subtitle has-text-grey">${Subtitle}</p>
           <div class="box">
-            <figure class="avatar">
-              <img src="https://placehold.it/128x128" />
-            </figure>
             <div ws-replace="Content">
             
               <form ws-template="HomeContent" method="post" action="${CreateLinkUrl}">
@@ -45,8 +42,8 @@
 
   <nav ws-template="MainNavBar" class="navbar is-dark" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="${HomeUrl}">
-        <img src="https://placehold.it/96x24" width="96" height="24" />
+      <a class="navbar-item has-text-weight-bold" href="${HomeUrl}">
+        Create link
       </a>
       <a class="navbar-item" href="${MyLinksUrl}">
         My links
