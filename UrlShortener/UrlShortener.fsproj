@@ -20,6 +20,14 @@
     <Compile Include="Site.fs" />
     <Compile Include="Startup.fs" />
     <Content Include="Main.html" CopyToPublishDirectory="Always" />
+    <Content Include="../packages/System.Data.SQLite.Core/runtimes/win-x64/lib/netstandard2.0/SQLite.Interop.dll" CopyToPublishDirectory="Always">
+      <Link>x64/SQLite.Interop.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../packages/System.Data.SQLite.Core/runtimes/win-x86/lib/netstandard2.0/SQLite.Interop.dll" CopyToPublishDirectory="Always">
+      <Link>x86/SQLite.Interop.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Target Name="CopyLib" BeforeTargets="BeforeCompile">
     <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x64/lib/netstandard2.0/SQLite.Interop.dll"
@@ -28,12 +36,6 @@
     <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x86/lib/netstandard2.0/SQLite.Interop.dll"
           DestinationFolder="../packages/System.Data.SQLite.Core/lib/netstandard2.0/x86"
           SkipUnchangedFiles="true" />
-  </Target>
-  <Target Name="CopyBin" AfterTargets="Build">
-    <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x64/lib/netstandard2.0/SQLite.Interop.dll"
-          DestinationFolder="$(OutputPath)/x64" />
-    <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x86/lib/netstandard2.0/SQLite.Interop.dll"
-          DestinationFolder="$(OutputPath)/x86" />
   </Target>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
