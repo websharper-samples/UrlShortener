@@ -6,7 +6,6 @@ open WebSharper.UI
 open WebSharper.UI.Html
 open WebSharper.UI.Client
 open WebSharper.Mvu
-open WebSharper.Mvu.Action
 
 module Model =
 
@@ -39,6 +38,14 @@ module Model =
 
 module View =
     open Model
+
+    let NewLinkButton () =
+        a [
+            attr.href "/"
+            attr.``class`` "button is-success"
+        ] [
+            text "Create new link"
+        ]
     
     let UpdateButton dispatch (model: View<Model>) =
         button [
@@ -82,7 +89,12 @@ module View =
                         th [] [text "Link"]
                         th [] [text "Target"]
                         th [] [text "Visits"]
-                        th [] [UpdateButton dispatch model]
+                        th [] [
+                            div [attr.``class`` "buttons"] [
+                                UpdateButton dispatch model
+                                NewLinkButton ()
+                            ]
+                        ]
                     ]
                 ]
                 tbody [] [
