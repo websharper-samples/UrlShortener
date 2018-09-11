@@ -42,3 +42,14 @@ module Remoting =
                 do! ctx.Db.DeleteLink(userId, slug)
                 return! getAllUserLinks ctx userId
         }
+
+    [<Remote>]
+    let CreateNewLink (url: string) =
+        let ctx = Web.Remoting.GetContext()
+        async {
+            match! Authentication.GetLoggedInUserId ctx with
+            | None -> return Array.empty
+            | Some userId ->
+                let! _ = ctx.Db.CreateLink(userId, url)
+                return! getAllUserLinks ctx userId
+        }

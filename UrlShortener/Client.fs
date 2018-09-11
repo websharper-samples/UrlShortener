@@ -2,6 +2,7 @@
 module UrlShortener.Client
 
 open WebSharper
+open WebSharper.JavaScript
 open WebSharper.UI
 open WebSharper.UI.Html
 open WebSharper.UI.Client
@@ -22,6 +23,7 @@ module Model =
             UserDisplayName: string
             Links: Map<string, LinkModel>
             IsLoading: bool
+            NewLinkText: string
         }
 
     let InitialModel userDisplayName =
@@ -29,22 +31,42 @@ module Model =
             UserDisplayName = userDisplayName
             Links = Map.empty
             IsLoading = true
+            NewLinkText = ""
         }
 
     type Message =
         | Refresh
         | Refreshed of links: DataModel.LinkData[]
         | Delete of slug: string
+        | SetNewLinkText of string
+        | CreateNewLink
 
 module View =
     open Model
 
-    let NewLinkButton () =
-        a [
-            attr.href "/"
-            attr.``class`` "button is-success"
+    let NewLinkForm dispatch (model: View<Model>) =
+        form [
+            on.submit (fun _ ev ->
+                ev.PreventDefault()
+                dispatch CreateNewLink)
+            attr.``class`` "field has-addons has-addons-centered"
         ] [
-            text "Create new link"
+            div [attr.``class`` "control"] [
+                input [
+                    attr.``class`` "input is-large"
+                    attr.placeholder "Shorten this link"
+                    attr.value model.V.NewLinkText
+                    on.change (fun el _ -> dispatch (SetNewLinkText el?value))
+                ] []
+            ]
+            div [attr.``class`` "control"] [
+                button [
+                    attr.``class`` "button is-info is-large"
+                    Attr.ClassPred "is-loading" model.V.IsLoading
+                ] [
+                    text "Shorten"
+                ]
+            ]
         ]
     
     let UpdateButton dispatch (model: View<Model>) =
@@ -77,9 +99,10 @@ module View =
         let total =
             V(Map.fold (fun res _ v -> res + v.VisitCount) 0L model.V.Links)
         Doc.Concat [
-            h1 [attr.``class`` "title"] [
+            h1 [attr.``class`` "title has-text-centered"] [
                 text ("Welcome, " + model.V.UserDisplayName + "!")
             ]
+            NewLinkForm dispatch model
             p [attr.``class`` "subtitle"] [
                 text "Here are the links you have created:"
             ]
@@ -89,12 +112,7 @@ module View =
                         th [] [text "Link"]
                         th [] [text "Target"]
                         th [] [text "Visits"]
-                        th [] [
-                            div [attr.``class`` "buttons"] [
-                                UpdateButton dispatch model
-                                NewLinkButton ()
-                            ]
-                        ]
+                        th [] [UpdateButton dispatch model]
                     ]
                 ]
                 tbody [] [
@@ -152,6 +170,12 @@ module Update =
                 )
                 |> Map.ofArray
             SetModel { model with Links = links; IsLoading = false }
+        | SetNewLinkText url ->
+            SetModel { model with NewLinkText = url }
+        | CreateNewLink ->
+            SetModel { model with IsLoading = true; NewLinkText = "" }
+            +
+            DispatchAsync Refreshed (Remoting.CreateNewLink model.NewLinkText)
 
 open Model
 open View
