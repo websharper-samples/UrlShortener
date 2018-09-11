@@ -69,9 +69,8 @@ type Site(config: IConfiguration) =
         |> Page ctx true
 
     /// Content shown after successfully creating a link.
-    let LinkCreatedPage (ctx: Context<EndPoint>) (linkId: string) =
-        let path = ctx.Link (Link linkId)
-        let url = UriBuilder(ctx.RequestUri, Path = path).ToString()
+    let LinkCreatedPage (ctx: Context<EndPoint>) (slug: string) =
+        let url = SlugToFullUrl ctx slug
         div [attr.``class`` "title"] [
             a [
                 attr.href url
@@ -97,7 +96,7 @@ type Site(config: IConfiguration) =
     override val Sitelet =
         facebook.RedirectEndpointSitelet
         <|>
-        Application.MultiPage (fun (ctx: Context<EndPoint>) endpoint -> async {
+        Sitelet.New Router (fun ctx endpoint -> async {
             match endpoint with
             | Home ->
                 match! Authentication.GetLoggedInUserData ctx with

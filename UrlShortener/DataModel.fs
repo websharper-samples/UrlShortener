@@ -2,6 +2,7 @@ module UrlShortener.DataModel
 
 open System
 open WebSharper
+open WebSharper.Sitelets.InferRouter
 
 /// Defines all the endpoints served by this application.
 type EndPoint =
@@ -11,6 +12,8 @@ type EndPoint =
     | [<EndPoint "GET /oauth">] OAuth
     | [<EndPoint "GET /">] Link of slug: string
     | [<EndPoint "POST /create-link"; FormData "url">] CreateLink of url: string
+
+let Router = Router.Infer<EndPoint>()
 
 [<JavaScript>]
 type LinkData =
@@ -41,12 +44,17 @@ let TryDecodeLinkId (slug: string) =
         try BitConverter.ToInt64(Convert.FromBase64String s, 0) |> Some
         with _ -> None
 
-/// Create a new random user id.
-let NewUserId() =
-    Guid.NewGuid()
-
 /// Create a new random link id.
 let NewLinkId() =
     let bytes = Array.zeroCreate<byte> 8
     Random().NextBytes(bytes)
     BitConverter.ToInt64(bytes, 0)
+
+let SlugToFullUrl (ctx: Web.Context) (slug: string) =
+    let builder = UriBuilder(ctx.RequestUri)
+    builder.Path <- Router.Link(Link slug)
+    builder.Uri.ToString()
+
+/// Create a new random user id.
+let NewUserId() =
+    Guid.NewGuid()
