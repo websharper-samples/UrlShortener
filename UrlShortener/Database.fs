@@ -103,12 +103,23 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
     }
 
     /// Get data about all the links created by the given user.
-    member this.GetAllUserLinks(userId: Guid) = async {
+    member this.GetAllUserLinks(userId: Guid, ctx: Web.Context) = async {
         let links =
             query { for l in db.Main.Redirection do
                     where (l.CreatorId = userId)
                     select l }
-        return Array.ofSeq links
+        return links
+            |> Seq.map (fun l ->
+                let slug = EncodeLinkId l.Id
+                let url = SlugToFullUrl ctx slug
+                {
+                    Slug = slug
+                    LinkUrl = url
+                    TargetUrl = l.Url
+                    VisitCount = l.VisitCount
+                } : DataModel.LinkData
+            )
+            |> Array.ofSeq
     }
 
     /// Check that this link belongs to this user, and if yes, delete it.
