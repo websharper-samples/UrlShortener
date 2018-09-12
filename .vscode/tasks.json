@@ -1,0 +1,66 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet build",
+            "type": "shell",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "run",
+            "command": "dotnet run -p UrlShortener",
+            "options": {
+                "env": {
+                    "ASPNETCORE_ENVIRONMENT": "development"
+                }
+            },
+            "linux": {
+                "options": {
+                    "env": {
+                        "LD_LIBRARY_PATH": "${workspaceFolder}/packages/System.Data.SQLite.Core/runtimes/linux-x64/lib/netstandard2.0"
+                    }
+                }
+            },
+            "osx": {
+                "options": {
+                    "env": {
+                        "LD_LIBRARY_PATH": "${workspaceFolder}/packages/System.Data.SQLite.Core/runtimes/osx-x64/lib/netstandard2.0"
+                    }
+                }
+            },
+            "type": "shell",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet watch -p UrlShortener.sln run -p UrlShortener",
+            "options": {
+                "env": {
+                    "ASPNETCORE_ENVIRONMENT": "development"
+                }
+            },
+            "linux": {
+                "options": {
+                    "env": {
+                        "LD_LIBRARY_PATH": "${workspaceFolder}/packages/System.Data.SQLite.Core/runtimes/linux-x64/lib/netstandard2.0"
+                    }
+                }
+            },
+            "osx": {
+                "options": {
+                    "env": {
+                        "LD_LIBRARY_PATH": "${workspaceFolder}/packages/System.Data.SQLite.Core/runtimes/osx-x64/lib/netstandard2.0"
+                    }
+                }
+            },
+            "type": "shell",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
