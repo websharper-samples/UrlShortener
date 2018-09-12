@@ -35,7 +35,7 @@ type Site(config: IConfiguration) =
         )
 
     /// The page body layout for "splash" style pages: home, login, link created.
-    let SplashBody (title: string) (subtitle: option<string>) (content: Doc) =
+    let SplashBody (title: string) (subtitle: string option) (content: Doc) =
         MainTemplate.SplashPage()
             .Title(title)
             .Subtitle(defaultArg subtitle "")
@@ -54,7 +54,7 @@ type Site(config: IConfiguration) =
         |> Page ctx false
 
     /// Content for the home page once logged in.
-    let HomePage (ctx: Context<EndPoint>) (user: UserData) =
+    let HomePage (ctx: Context<EndPoint>) (user: User.Data) =
         MainTemplate.HomeContent()
             .CreateLinkUrl(ctx.Link (CreateLink ""))
             .Doc()
@@ -62,15 +62,15 @@ type Site(config: IConfiguration) =
         |> Page ctx true
 
     /// Content for the account management page.
-    let MyLinksPage (ctx: Context<EndPoint>) (user: UserData) =
+    let MyLinksPage (ctx: Context<EndPoint>) (user: User.Data) =
         MainTemplate.MyLinksPage()
             .Content(client <@ Client.MyLinks user @>)
             .Doc()
         |> Page ctx true
 
     /// Content shown after successfully creating a link.
-    let LinkCreatedPage (ctx: Context<EndPoint>) (slug: string) =
-        let url = SlugToFullUrl ctx slug
+    let LinkCreatedPage (ctx: Context<EndPoint>) (slug: Link.Slug) =
+        let url = Link.SlugToFullUrl ctx slug
         div [attr.``class`` "title"] [
             a [
                 attr.href url
@@ -120,5 +120,6 @@ type Site(config: IConfiguration) =
                     let! slug = ctx.Db.CreateLink(uid, url)
                     return! LinkCreatedPage ctx slug
             | OAuth ->
+                // This is already handled by facebook.RedirectEndpointSitelet.
                 return! Content.ServerError
         })

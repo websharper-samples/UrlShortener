@@ -60,7 +60,7 @@ let FacebookProvider (config: IConfiguration) =
     )
 
 /// Get the user id of the currently logged in user.
-let GetLoggedInUserId (ctx: Web.Context) = async {
+let GetLoggedInUserId (ctx: Web.Context) : Async<User.Id option> = async {
     match! ctx.UserSession.GetLoggedInUser() with
     | None -> return None
     | Some s ->
@@ -72,7 +72,7 @@ let GetLoggedInUserId (ctx: Web.Context) = async {
 }
 
 /// Get the user data of the currently logged in user.
-let GetLoggedInUserData (ctx: Web.Context) = async {
+let GetLoggedInUserData (ctx: Web.Context) : Async<User.Data option> = async {
     match! GetLoggedInUserId ctx with
     | None -> return None
     | Some uid -> return! ctx.Db.GetUserData(uid)

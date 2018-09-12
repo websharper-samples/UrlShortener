@@ -10,7 +10,7 @@ module Remoting =
 
     /// Retrieve a list of the links created by the logged in user.
     [<Remote>]
-    let GetMyLinks () =
+    let GetMyLinks () : Async<Link.Data[]> =
         let ctx = Web.Remoting.GetContext()
         async {
             match! Authentication.GetLoggedInUserId ctx with
@@ -21,7 +21,7 @@ module Remoting =
     /// Delete this link, if it was created by the logged in user.
     /// Return a list of the links created by the logged in user.
     [<Remote>]
-    let DeleteLink (slug: string) =
+    let DeleteLink (slug: Link.Slug) : Async<Link.Data[]> =
         let ctx = Web.Remoting.GetContext()
         async {
             match! Authentication.GetLoggedInUserId ctx with
@@ -34,7 +34,7 @@ module Remoting =
     /// Create a new link pointing to this URL.
     /// Return a list of the links created by the logged in user.
     [<Remote>]
-    let CreateNewLink (url: string) =
+    let CreateNewLink (url: Link.Slug) : Async<Link.Data[]> =
         let ctx = Web.Remoting.GetContext()
         async {
             match! Authentication.GetLoggedInUserId ctx with

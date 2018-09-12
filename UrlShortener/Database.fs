@@ -42,7 +42,7 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
             logger.LogCritical("Database migration failed: {0}", ex)
 
     /// Get the user for this Facebook user id, or create a user if there isn't one.
-    member this.GetOrCreateFacebookUser(fbUserId: string, fbUserName: string) = async {
+    member this.GetOrCreateFacebookUser(fbUserId: string, fbUserName: string) : Async<User.Id> = async {
         let existing =
             query { for u in db.Main.User do
                     where (u.FacebookId = fbUserId)
@@ -52,7 +52,7 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
         | None ->
             let u =
                 db.Main.User.Create(
-                    Id = NewUserId(),
+                    Id = User.NewUserId(),
                     FacebookId = fbUserId,
                     FullName = fbUserName)
             do! db.SubmitUpdatesAsync()
@@ -62,7 +62,7 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
     }
 
     /// Get the user's full name.
-    member this.GetUserData(userId: Guid) = async {
+    member this.GetUserData(userId: User.Id) : Async<User.Data option> = async {
         let name =
             query { for u in db.Main.User do
                     where (u.Id = userId)
@@ -72,26 +72,26 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
             {
                 UserId = userId
                 FullName = name
-            }
+            } : User.Data
         )
     }
 
     /// Create a new link on this user's behalf, pointing to this url.
     /// Returns the slug for this new link.
-    member this.CreateLink(userId: Guid, url: string) = async {
+    member this.CreateLink(userId: User.Id, url: string) : Async<Link.Slug> = async {
         let r =
             db.Main.Redirection.Create(
-                Id = NewLinkId(),
+                Id = Link.NewLinkId(),
                 CreatorId = userId,
                 Url = url)
         do! db.SubmitUpdatesAsync()
-        return EncodeLinkId r.Id
+        return Link.EncodeLinkId r.Id
     }
 
     /// Get the url pointed to by the given slug, if any,
     /// and increment its visit count.
-    member this.TryVisitLink(slug: string) = async {
-        match TryDecodeLinkId slug with
+    member this.TryVisitLink(slug: Link.Slug) : Async<string option> = async {
+        match Link.TryDecodeLinkId slug with
         | None -> return None
         | Some linkId ->
             let link =
@@ -108,28 +108,28 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
     }
 
     /// Get data about all the links created by the given user.
-    member this.GetAllUserLinks(userId: Guid, ctx: Web.Context) = async {
+    member this.GetAllUserLinks(userId: User.Id, ctx: Web.Context) : Async<Link.Data[]> = async {
         let links =
             query { for l in db.Main.Redirection do
                     where (l.CreatorId = userId)
                     select l }
         return links
             |> Seq.map (fun l ->
-                let slug = EncodeLinkId l.Id
-                let url = SlugToFullUrl ctx slug
+                let slug = Link.EncodeLinkId l.Id
+                let url = Link.SlugToFullUrl ctx slug
                 {
                     Slug = slug
                     LinkUrl = url
                     TargetUrl = l.Url
                     VisitCount = l.VisitCount
-                } : DataModel.LinkData
+                } : Link.Data
             )
             |> Array.ofSeq
     }
 
     /// Check that this link belongs to this user, and if yes, delete it.
-    member this.DeleteLink(userId: Guid, slug: string) = async {
-        match TryDecodeLinkId slug with
+    member this.DeleteLink(userId: User.Id, slug: Link.Slug) : Async<unit> = async {
+        match Link.TryDecodeLinkId slug with
         | None -> return ()
         | Some linkId ->
             let link =
@@ -146,5 +146,5 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
 
 type Web.Context with
     /// Get a new database context.
-    member this.Db =
+    member this.Db : Context =
         this.HttpContext().RequestServices.GetRequiredService<Context>()

@@ -7,6 +7,7 @@ open WebSharper.UI
 open WebSharper.UI.Html
 open WebSharper.UI.Client
 open WebSharper.Mvu
+open UrlShortener.DataModel
 
 /// Defines the model of this client side page,
 /// ie. the data types that represent the state and its transitions.
@@ -24,11 +25,11 @@ module Model =
     /// The state of the full page.
     type State =
         {
-            User: DataModel.UserData
-            Links: Map<string, LinkState>
+            User: User.Data
+            Links: Map<Link.Slug, LinkState>
             IsLoading: bool
             NewLinkText: string
-            PromptingDelete: option<string>
+            PromptingDelete: Link.Slug option
         }
 
         member this.TotalVisitCount =
@@ -48,9 +49,9 @@ module Model =
     /// The full list of actions that can be performed on the state.
     type Message =
         | Refresh
-        | Refreshed of links: DataModel.LinkData[]
-        | PromptDelete of slug: option<string>
-        | ConfirmDelete of slug: string
+        | Refreshed of links: Link.Data[]
+        | PromptDelete of slug: Link.Slug option
+        | ConfirmDelete of slug: Link.Slug
         | SetNewLinkText of string
         | CreateNewLink
 
@@ -253,7 +254,7 @@ open View
 open Update
 
 /// Binds together the model, the view and the update.
-let MyLinks (user: DataModel.UserData) =
+let MyLinks (user: User.Data) =
     App.Create (InitialState user) Update Page
     |> App.WithInitAction (Command (fun dispatch -> dispatch Refresh))
     |> App.Run
