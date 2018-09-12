@@ -24,7 +24,8 @@ type LinkData =
         VisitCount: int64
     }
 
-/// Base64-URL encoding.
+/// Create a link slug from a link id.
+/// Uses base64-URL encoding.
 let EncodeLinkId (linkId: int64) =
     let bytes = BitConverter.GetBytes(linkId)
     Convert.ToBase64String(bytes)
@@ -32,7 +33,8 @@ let EncodeLinkId (linkId: int64) =
         .Replace('+', '-')
         .Replace('/', '_')
 
-/// Base64-URL decoding.
+/// Extract the link id from a link slug.
+/// Uses base64-URL decoding.
 let TryDecodeLinkId (slug: string) =
     if String.IsNullOrEmpty slug then
         Some 0L
@@ -50,6 +52,7 @@ let NewLinkId() =
     Random().NextBytes(bytes)
     BitConverter.ToInt64(bytes, 0)
 
+/// Create a full URL from a link slug.
 let SlugToFullUrl (ctx: Web.Context) (slug: string) =
     let builder = UriBuilder(ctx.RequestUri)
     builder.Path <- Router.Link(Link slug)

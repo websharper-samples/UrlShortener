@@ -5,8 +5,10 @@ open WebSharper
 open UrlShortener.DataModel
 open UrlShortener.Database
 
+/// Functions that can be called from the client side.
 module Remoting =
 
+    /// Retrieve a list of the links created by the logged in user.
     [<Remote>]
     let GetMyLinks () =
         let ctx = Web.Remoting.GetContext()
@@ -16,6 +18,8 @@ module Remoting =
             | Some userId -> return! ctx.Db.GetAllUserLinks(userId, ctx)
         }
 
+    /// Delete this link, if it was created by the logged in user.
+    /// Return a list of the links created by the logged in user.
     [<Remote>]
     let DeleteLink (slug: string) =
         let ctx = Web.Remoting.GetContext()
@@ -27,6 +31,8 @@ module Remoting =
                 return! ctx.Db.GetAllUserLinks(userId, ctx)
         }
 
+    /// Create a new link pointing to this URL.
+    /// Return a list of the links created by the logged in user.
     [<Remote>]
     let CreateNewLink (url: string) =
         let ctx = Web.Remoting.GetContext()
