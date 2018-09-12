@@ -16,7 +16,7 @@ type MainTemplate = Templating.Template<"Main.html", serverLoad = Templating.Ser
 
 /// The full website.
 type Site(config: IConfiguration) =
-    inherit ISiteletService<EndPoint>()
+    inherit SiteletService<EndPoint>()
 
     let NavBar (ctx: Context<EndPoint>) =
         MainTemplate.MainNavBar()
