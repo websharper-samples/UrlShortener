@@ -54,7 +54,7 @@ type Site(config: IConfiguration) =
         |> Page ctx false
 
     /// Content for the home page once logged in.
-    let HomePage (ctx: Context<EndPoint>) (name: string) =
+    let HomePage (ctx: Context<EndPoint>) (user: UserData) =
         MainTemplate.HomeContent()
             .CreateLinkUrl(ctx.Link (CreateLink ""))
             .Doc()
@@ -62,9 +62,9 @@ type Site(config: IConfiguration) =
         |> Page ctx true
 
     /// Content for the account management page.
-    let MyLinksPage (ctx: Context<EndPoint>) (name: string) =
+    let MyLinksPage (ctx: Context<EndPoint>) (user: UserData) =
         MainTemplate.MyLinksPage()
-            .Content(client <@ Client.MyLinks name @>)
+            .Content(client <@ Client.MyLinks user @>)
             .Doc()
         |> Page ctx true
 
@@ -101,11 +101,11 @@ type Site(config: IConfiguration) =
             | Home ->
                 match! Authentication.GetLoggedInUserData ctx with
                 | None -> return! LoginPage ctx facebook
-                | Some name -> return! HomePage ctx name
+                | Some user -> return! HomePage ctx user
             | MyLinks ->
                 match! Authentication.GetLoggedInUserData ctx with
                 | None -> return! Content.RedirectTemporary Home
-                | Some name -> return! MyLinksPage ctx name
+                | Some user -> return! MyLinksPage ctx user
             | Link slug ->
                 match! ctx.Db.TryVisitLink(slug) with
                 | Some url -> return! Content.RedirectTemporaryToUrl url

@@ -24,7 +24,7 @@ module Model =
     /// The state of the full page.
     type State =
         {
-            UserDisplayName: string
+            User: DataModel.UserData
             Links: Map<string, LinkState>
             IsLoading: bool
             NewLinkText: string
@@ -36,9 +36,9 @@ module Model =
                 0L this.Links
 
     /// The initial state of the page.
-    let InitialState userDisplayName =
+    let InitialState user =
         {
-            UserDisplayName = userDisplayName
+            User = user
             Links = Map.empty
             IsLoading = true
             NewLinkText = ""
@@ -191,7 +191,7 @@ module View =
     let Page dispatch (state: View<State>) =
         Doc.Concat [
             h1 [attr.``class`` "title has-text-centered"] [
-                text ("Welcome, " + state.V.UserDisplayName + "!")
+                text ("Welcome, " + state.V.User.FullName + "!")
             ]
             NewLinkForm dispatch state
             p [attr.``class`` "subtitle"] [
@@ -253,7 +253,7 @@ open View
 open Update
 
 /// Binds together the model, the view and the update.
-let MyLinks (userDisplayName: string) =
-    App.Create (InitialState userDisplayName) Update Page
+let MyLinks (user: DataModel.UserData) =
+    App.Create (InitialState user) Update Page
     |> App.WithInitAction (Command (fun dispatch -> dispatch Refresh))
     |> App.Run

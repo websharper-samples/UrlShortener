@@ -24,6 +24,13 @@ type LinkData =
         VisitCount: int64
     }
 
+[<JavaScript>]
+type UserData =
+    {
+        UserId: Guid
+        FullName: string
+    }
+
 /// Create a link slug from a link id.
 /// Uses base64-URL encoding.
 let EncodeLinkId (linkId: int64) =

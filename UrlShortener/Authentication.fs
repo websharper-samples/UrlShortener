@@ -75,5 +75,5 @@ let GetLoggedInUserId (ctx: Web.Context) = async {
 let GetLoggedInUserData (ctx: Web.Context) = async {
     match! GetLoggedInUserId ctx with
     | None -> return None
-    | Some uid -> return! ctx.Db.GetFullName(uid)
+    | Some uid -> return! ctx.Db.GetUserData(uid)
 }

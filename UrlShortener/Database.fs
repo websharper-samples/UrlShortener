@@ -62,13 +62,18 @@ type Context(config: IConfiguration, logger: ILogger<Context>) =
     }
 
     /// Get the user's full name.
-    member this.GetFullName(userId: Guid) = async {
-        let u =
+    member this.GetUserData(userId: Guid) = async {
+        let name =
             query { for u in db.Main.User do
                     where (u.Id = userId)
                     select (Some u.FullName)
                     headOrDefault }
-        return u
+        return name |> Option.map (fun name ->
+            {
+                UserId = userId
+                FullName = name
+            }
+        )
     }
 
     /// Create a new link on this user's behalf, pointing to this url.
