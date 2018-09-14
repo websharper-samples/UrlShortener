@@ -1,5 +1,4 @@
 source https://api.nuget.org/v3/index.json
-source https://daily.websharper.com/nuget
 
 framework: netcoreapp2.1
 storage: none
