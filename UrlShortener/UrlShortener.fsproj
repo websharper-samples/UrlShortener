@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <WebSharperProject>Website</WebSharperProject>
     <WebProjectOutputDir>$(MSBuildThisFileDirectory)/wwwroot</WebProjectOutputDir>
     <WebSharperUseNetFxCompiler>True</WebSharperUseNetFxCompiler>
@@ -20,21 +20,21 @@
     <Compile Include="Site.fs" />
     <Compile Include="Startup.fs" />
     <Content Include="Main.html" CopyToPublishDirectory="Always" />
-    <Content Include="../packages/System.Data.SQLite.Core/runtimes/win-x64/lib/netstandard2.0/SQLite.Interop.dll" CopyToPublishDirectory="Always">
+    <Content Include="../packages/System.Data.SQLite.Core/runtimes/win-x64/native/netstandard2.0/SQLite.Interop.dll" CopyToPublishDirectory="Always">
       <Link>x64/SQLite.Interop.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="../packages/System.Data.SQLite.Core/runtimes/win-x86/lib/netstandard2.0/SQLite.Interop.dll" CopyToPublishDirectory="Always">
+    <Content Include="../packages/System.Data.SQLite.Core/runtimes/win-x86/native/netstandard2.0/SQLite.Interop.dll" CopyToPublishDirectory="Always">
       <Link>x86/SQLite.Interop.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Target Name="CopyLib" BeforeTargets="BeforeCompile">
-    <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x64/lib/netstandard2.0/SQLite.Interop.dll"
-          DestinationFolder="../packages/System.Data.SQLite.Core/lib/netstandard2.0/x64"
+    <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x64/native/netstandard2.0/SQLite.Interop.dll"
+          DestinationFolder="../packages/System.Data.SQLite.Core/native/netstandard2.0/x64"
           SkipUnchangedFiles="true" />
-    <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x86/lib/netstandard2.0/SQLite.Interop.dll"
-          DestinationFolder="../packages/System.Data.SQLite.Core/lib/netstandard2.0/x86"
+    <Copy SourceFiles="../packages/System.Data.SQLite.Core/runtimes/win-x86/native/netstandard2.0/SQLite.Interop.dll"
+          DestinationFolder="../packages/System.Data.SQLite.Core/native/netstandard2.0/x86"
           SkipUnchangedFiles="true" />
   </Target>
   <Import Project="..\.paket\Paket.Restore.targets" />
