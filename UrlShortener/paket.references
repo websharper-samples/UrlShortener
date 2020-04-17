@@ -1,9 +1,5 @@
-Microsoft.AspNetCore.All
-WebSharper
 WebSharper.FSharp
-WebSharper.UI
 WebSharper.AspNetCore
-FSharp.Core
 WebSharper.Mvu
 WebSharper.OAuth
 SQLProvider
