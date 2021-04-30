@@ -7,6 +7,6 @@ nuget WebSharper.AspNetCore
 nuget WebSharper.FSharp
 nuget WebSharper.Mvu
 nuget WebSharper.OAuth
-nuget SQLProvider
-nuget System.Data.SQLite.Core storage: packages
+nuget SQLProvider 1.1.76
+nuget System.Data.SQLite.Core 1.0.112 storage: packages
 nuget Evolve ~> 1.8

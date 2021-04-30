@@ -11,6 +11,7 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="paket.references" />
     <Content Include="db\migrations\*.sql" CopyToPublishDirectory="Always" />
     <Compile Include="DataModel.fs" />
     <Compile Include="Database.fs" />
