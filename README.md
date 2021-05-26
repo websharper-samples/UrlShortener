@@ -11,8 +11,6 @@ It features:
 
 [![Application screenshot: "My links" page](./docs/my-links.png)](https://websharper-url-shortener.azurewebsites.net/)
 
-You can see it running on Azure [here](https://websharper-url-shortener.azurewebsites.net/).
-
 ## Requirements
 
 * [The .NET Core SDK](https://www.microsoft.com/net/download), version 2.1.401 or newer.
